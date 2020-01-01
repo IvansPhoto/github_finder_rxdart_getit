@@ -283,10 +283,10 @@ class UserService {
   Stream get streamUserProfile$ => _userProfile.stream;
   UserProfile get currentUserProfile => _userProfile.value;
 
-  void searchUsers(String login) async {
+  void searchUsers({String searchString, int perPage = 15, int pageNumber = 1}) async {
     _isLoading.add(true);
     try {
-      Response response = await get('https://api.github.com/search/users?q=$login&per_page=10');
+      Response response = await get('https://api.github.com/search/users?q=$searchString&per_page=$perPage&page=$pageNumber');
       GitHubUserResponse gitHubUserResponse = GitHubUserResponse.fromJson(jsonDecode(response.body));
       _allUsers.add(gitHubUserResponse);
     } catch (error) {

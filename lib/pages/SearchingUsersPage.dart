@@ -4,7 +4,7 @@ import 'package:github_finder_rxdart_getit/widgets.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 
 class SearchingUsersPage extends StatelessWidget {
-  final _userNameService = getIt.get<UserService>();
+  final _userService = getIt.get<UserService>();
   final _userNameKey = TextEditingController();
 
   @override
@@ -33,7 +33,7 @@ class SearchingUsersPage extends StatelessWidget {
                       disabledTextColor: Colors.grey[400],
                       onPressed: () {
                         if (_userNameKey.text != '') {
-                          _userNameService.searchUsers(_userNameKey.text);
+                          _userService.searchUsers(searchString: _userNameKey.text);
                           Navigator.pushNamed(context, RouteNames.users);
                         }
                       },

@@ -36,6 +36,31 @@ class MainDrawer extends StatelessWidget {
 	}
 }
 
+class ImageUrlIndicator extends StatelessWidget {
+	final String url;
+	final double height;
+	final double width;
+
+	ImageUrlIndicator({this.url, this.height = 100, this.width = 100});
+
+	@override
+	Widget build(BuildContext context) {
+		return Image.network(
+			url,
+			height: height,
+			width: width,
+			loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent loadingProgress) {
+				if (loadingProgress == null) return child;
+				return Center(
+					child: CircularProgressIndicator(
+						value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes : null,
+					),
+				);
+			},
+		);
+	}
+}
+
 class MainAppBar extends AppBar {
 	final String newTitle;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
+import 'package:github_finder_rxdart_getit/widgets.dart';
 
 class UserProfilePage extends StatelessWidget {
   final usersServiceGetIt = getIt.get<UserService>();
@@ -20,16 +21,10 @@ class UserProfilePage extends StatelessWidget {
               final UserProfile theUserProfile = snapshot.data;
               return ListView(
                 children: <Widget>[
-                  Image.network(
-                    theUserProfile.avatarUrl,
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes : null,
-                        ),
-                      );
-                    },
+                  ImageUrlIndicator(
+                    url: theUserProfile.avatarUrl,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width,
                   ),
                   Text(theUserProfile.login),
                   Text(theUserProfile.name),

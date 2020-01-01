@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 
+import '../widgets.dart';
+
 class ShowUsersPage extends StatelessWidget {
   final usersServiceGetIt = getIt.get<UserService>();
 
@@ -44,19 +46,7 @@ class ShowUsersPage extends StatelessWidget {
                               elevation: 0,
                               child: Row(
                                 children: <Widget>[
-                                  Image.network(
-                                    gitHubUsers[index].avatarUrl,
-                                    height: 100,
-                                    width: 100,
-                                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes : null,
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  ImageUrlIndicator(url: gitHubUsers[index].avatarUrl),
                                   Container(width: 10),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,3 +76,5 @@ class ShowUsersPage extends StatelessWidget {
     );
   }
 }
+
+
