@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 
 class UserProfilePage extends StatelessWidget {
@@ -14,7 +15,7 @@ class UserProfilePage extends StatelessWidget {
           stream: usersServiceGetIt.streamUserProfile$,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData || usersServiceGetIt.isLoadingValue) {
-              return Center(child: CircularProgressIndicator());
+              return Center(child: LoadingScreen());
             } else {
               final UserProfile theUserProfile = snapshot.data;
               return ListView(
