@@ -3,7 +3,6 @@ import 'package:github_finder_rxdart_getit/widgets.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 
 class SearchingUsersPage extends StatelessWidget {
-//  final _userService = getIt.get<UserService>();
 	final _searchParameters = getIt.get<SearchParameters>();
 	final _formKey = GlobalKey<FormState>();
 	final _userNameKey = TextEditingController();
@@ -38,9 +37,6 @@ class SearchingUsersPage extends StatelessWidget {
 										decoration: const InputDecoration(hintText: 'Result per  page'),
 //                    initialValue: '15',
 										validator: (value) => value.isEmpty ? 'Enter a user name here.' : null,
-										onSaved: (String value) {
-											print(value);
-										},
 									),
 									FlatButton(
 										color: Theme.of(context).primaryColor,
@@ -49,9 +45,9 @@ class SearchingUsersPage extends StatelessWidget {
 										onPressed: () {
 											if (_formKey.currentState.validate()) {
 												_searchParameters.setString = _userNameKey.text; //Set search string to object.
-												_searchParameters.searchUsers(searchParameters: _searchParameters, initSearch: true);
-//												_userService.searchUsers(searchString: _userNameKey.text);
-//												Navigator.pushNamed(context, RouteNames.users);
+												_searchParameters.setPerPage = int.parse(_perPageKey.text);
+												_searchParameters.searchUsers(context: context,searchParameters: _searchParameters);
+												Navigator.pushNamed(context, RouteNames.users);
 											}
 										},
 										child: Text('Submit'),

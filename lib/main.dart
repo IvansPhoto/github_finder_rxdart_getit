@@ -7,7 +7,6 @@ import 'package:github_finder_rxdart_getit/pages/UserProfilePage.dart';
 import 'services.dart';
 
 void main() {
-	getIt.registerLazySingleton<UserService>(() => UserService());
 	getIt.registerLazySingleton<SearchParameters>(() => SearchParameters());
 	runApp(MaterialApp(
 		initialRoute: RouteNames.index,
@@ -25,8 +24,8 @@ void main() {
 			textTheme: TextTheme(
 				title: TextStyle(fontSize: 20, color: Colors.orange),
 				button: TextStyle(fontSize: 30, color: Colors.orange),
-				body1: TextStyle(fontSize: 20, color: Colors.red[50]),
-				display1: TextStyle(fontSize: 35, color: Colors.red[50]),
+				body1: TextStyle(fontSize: 20, color: Colors.grey[800]),
+				display1: TextStyle(fontSize: 35, color: Colors.red[500]),
 			),
 		),
 		darkTheme: ThemeData(

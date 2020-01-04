@@ -4,7 +4,6 @@ import 'package:github_finder_rxdart_getit/services.dart';
 import 'package:github_finder_rxdart_getit/widgets.dart';
 
 class SearchUsersResultPage extends StatelessWidget {
-//  final usersServiceGetIt = getIt.get<UserService>();
   final _searchParameters = getIt.get<SearchParameters>();
 
   @override
@@ -14,7 +13,7 @@ class SearchUsersResultPage extends StatelessWidget {
       body: StreamBuilder(
           stream: _searchParameters.streamGHUResponse$,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (!snapshot.hasData || _searchParameters.isLoadingValue) {
+            if (!snapshot.hasData) {
               return LoadingScreen();
             } else {
               final List<GitHubUsers> gitHubUsers = snapshot.data.users;
@@ -26,11 +25,11 @@ class SearchUsersResultPage extends StatelessWidget {
                     children: <Widget>[
                       IconButton(icon: Icon(Icons.navigate_before), onPressed: () {
                         _searchParameters.decreasePage();
-                        _searchParameters.searchUsers(searchParameters: _searchParameters);
+                        _searchParameters.searchUsers(searchParameters: _searchParameters, context: context);
                       }),
                       IconButton(icon: Icon(Icons.navigate_next), onPressed: () {
                         _searchParameters.increasePage();
-                        _searchParameters.searchUsers(searchParameters: _searchParameters);
+                        _searchParameters.searchUsers(searchParameters: _searchParameters, context: context);
                       }),
                     ],
                   ),
@@ -39,14 +38,7 @@ class SearchUsersResultPage extends StatelessWidget {
                         itemCount: gitHubUsers.length + 1,
                         itemBuilder: (BuildContext context, int index) {
                           if (index > gitHubUsers.length - 1) {
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                IconButton(icon: Icon(Icons.navigate_before), onPressed: () {}),
-                                IconButton(icon: Icon(Icons.navigate_next), onPressed: () {}),
-                              ],
-                            );
+                            return searchingButton(context);
                           } else {
                             return Card(
                               elevation: 0,
@@ -62,8 +54,6 @@ class SearchUsersResultPage extends StatelessWidget {
                                       FlatButton(
                                         onPressed: () {
                                           SearchParameters.getUserProfile(context: context, url: gitHubUsers[index].url);
-//                                          usersServiceGetIt.getUserProfile(snapshot.data.users[index].url);
-//                                          Navigator.pushNamed(context, RouteNames.profile);
                                         },
                                         child: Text('View profile'),
                                         color: Theme.of(context).primaryColor,
