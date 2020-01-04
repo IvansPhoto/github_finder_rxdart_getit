@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
+import 'package:github_finder_rxdart_getit/widgets.dart';
 
-import '../widgets.dart';
-
-class ShowUsersPage extends StatelessWidget {
-  final usersServiceGetIt = getIt.get<UserService>();
+class SearchUsersResultPage extends StatelessWidget {
+//  final usersServiceGetIt = getIt.get<UserService>();
+  final _searchParameters = getIt.get<SearchParameters>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('The Users have found'), elevation: 0, centerTitle: true),
       body: StreamBuilder(
-          stream: usersServiceGetIt.streamAllUsers$,
+          stream: _searchParameters.streamGHUResponse$,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (!snapshot.hasData || usersServiceGetIt.isLoadingValue) {
+            if (!snapshot.hasData || _searchParameters.isLoadingValue) {
               return LoadingScreen();
             } else {
               final List<GitHubUsers> gitHubUsers = snapshot.data.users;
@@ -24,8 +24,14 @@ class ShowUsersPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      IconButton(icon: Icon(Icons.navigate_before), onPressed: () {}),
-                      IconButton(icon: Icon(Icons.navigate_next), onPressed: () {}),
+                      IconButton(icon: Icon(Icons.navigate_before), onPressed: () {
+                        _searchParameters.decreasePage();
+                        _searchParameters.searchUsers(searchParameters: _searchParameters);
+                      }),
+                      IconButton(icon: Icon(Icons.navigate_next), onPressed: () {
+                        _searchParameters.increasePage();
+                        _searchParameters.searchUsers(searchParameters: _searchParameters);
+                      }),
                     ],
                   ),
                   Expanded(
@@ -55,8 +61,9 @@ class ShowUsersPage extends StatelessWidget {
                                       Text('Score: ' + gitHubUsers[index].score.toString()),
                                       FlatButton(
                                         onPressed: () {
-                                          usersServiceGetIt.getUserProfile(snapshot.data.users[index].url);
-                                          Navigator.pushNamed(context, RouteNames.profile);
+                                          SearchParameters.getUserProfile(context: context, url: gitHubUsers[index].url);
+//                                          usersServiceGetIt.getUserProfile(snapshot.data.users[index].url);
+//                                          Navigator.pushNamed(context, RouteNames.profile);
                                         },
                                         child: Text('View profile'),
                                         color: Theme.of(context).primaryColor,

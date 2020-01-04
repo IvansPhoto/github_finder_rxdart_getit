@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart';
 import 'package:get_it/get_it.dart';
@@ -10,6 +11,7 @@ abstract class RouteNames {
   static const String users = '/users';
   static const String profile = '/profile';
   static const String loading = '/loading';
+  static const String error = '/error';
 }
 
 GetIt getIt = GetIt.instance;
@@ -166,7 +168,6 @@ class UserProfile {
   String updatedAt;
 
   UserProfile(
-      //Validation on null
       {this.login,
       this.id,
       this.nodeId,
@@ -270,40 +271,109 @@ class UserProfile {
   }
 }
 
+
 class UserService {
   final BehaviorSubject _isLoading = BehaviorSubject<bool>();
   Stream get streamIsLoading$ => _isLoading.stream;
   bool get isLoadingValue => _isLoading.value;
+  set setLoadingValue(bool loading) => _isLoading.add(loading);
 
-  final _allUsers = BehaviorSubject<GitHubUserResponse>();
-  Stream get streamAllUsers$ => _allUsers.stream;
-  GitHubUserResponse get currentUserNames => _allUsers.value;
+  final _gitHubUserResponse = BehaviorSubject<GitHubUserResponse>();
+  Stream get streamGHUResponse$ => _gitHubUserResponse.stream;
+  GitHubUserResponse get currentGHUResponse => _gitHubUserResponse.value;
+  set setGHUResponse(GitHubUserResponse gitHubUserResponse) => _gitHubUserResponse.add(gitHubUserResponse);
 
-  final _userProfile = BehaviorSubject<UserProfile>();
-  Stream get streamUserProfile$ => _userProfile.stream;
-  UserProfile get currentUserProfile => _userProfile.value;
+//	final _searchParams = BehaviorSubject<SearchParameters>();
+//	Stream get streamSearch$ => _searchParams.stream;
+//	SearchParameters get currentSearch => _searchParams.value;
+//	set setSearchParams(SearchParameters searchParameters) => _searchParams.add(searchParameters);
 
   void searchUsers({String searchString, int perPage = 15, int pageNumber = 1}) async {
     _isLoading.add(true);
     try {
       Response response = await get('https://api.github.com/search/users?q=$searchString&per_page=$perPage&page=$pageNumber');
       GitHubUserResponse gitHubUserResponse = GitHubUserResponse.fromJson(jsonDecode(response.body));
-      _allUsers.add(gitHubUserResponse);
+      _gitHubUserResponse.add(gitHubUserResponse);
     } catch (error) {
       print(error);
     }
     _isLoading.add(false);
   }
 
-  void getUserProfile(String url) async {
-    _isLoading.add(true);
+//  final _userProfile = BehaviorSubject<UserProfile>();
+//  Stream get streamUserProfile$ => _userProfile.stream;
+//  UserProfile get currentUserProfile => _userProfile.value;
+
+//  void getUserProfile(String url) async {
+//    _isLoading.add(true);
+//    try {
+//      Response response = await get(url);
+//      UserProfile userProfile = UserProfile.fromJson(jsonDecode(response.body));
+//      _userProfile.add(userProfile);
+//    } catch (error) {
+//      print(error);
+//    }
+//    _isLoading.add(false);
+//  }
+}
+
+class SearchParameters {
+  String searchString;
+  int page;
+  int perPage;
+  SearchParameters({this.searchString, this.page = 1, this.perPage = 15});
+
+  set setString(String newSearchString) => searchString = newSearchString;
+  set setPage(int newPage) => page = newPage;
+  set setPerPage(int newPerPage) => perPage = newPerPage;
+
+  void increasePage() => page++;
+  void decreasePage() => page--;
+
+  String get getSearchString => searchString;
+  int get getPage => page;
+  int get getPerPage => perPage;
+
+  final _searchPageParams = BehaviorSubject<SearchParameters>();
+  Stream get streamSearchParams$ => _searchPageParams.stream;
+  SearchParameters get currentSearchParams => _searchPageParams.value;
+  set setSearchParams(SearchParameters currentSearchParams) => _searchPageParams.add(currentSearchParams);
+
+  final _gitHubUserResponse = BehaviorSubject<GitHubUserResponse>();
+  Stream get streamGHUResponse$ => _gitHubUserResponse.stream;
+  GitHubUserResponse get currentGHUResponse => _gitHubUserResponse.value;
+  set setGHUResponse(GitHubUserResponse gitHubUserResponse) => _gitHubUserResponse.add(gitHubUserResponse);
+
+  final BehaviorSubject _isLoading = BehaviorSubject<bool>();
+  Stream get streamIsLoading$ => _isLoading.stream;
+  bool get isLoadingValue => _isLoading.value;
+  set setLoadingValue(bool loading) => _isLoading.add(loading);
+
+  void searchUsers({BuildContext context, SearchParameters searchParameters, bool initSearch = false}) async {
+    setLoadingValue = true;
+    try {
+      Response response =
+          await get('https://api.github.com/search/users?q=${searchParameters.getSearchString}&per_page=${searchParameters.getPerPage}&page=${searchParameters.getPage}');
+      GitHubUserResponse gitHubUserResponse = GitHubUserResponse.fromJson(jsonDecode(response.body));
+      initSearch
+          ? Navigator.pushNamed(context, RouteNames.users, arguments: gitHubUserResponse)
+          : Navigator.pushReplacementNamed(context, RouteNames.users, arguments: gitHubUserResponse);
+    } catch (error) {
+      print(error);
+      Navigator.pushNamed(context, RouteNames.error, arguments: error); //Check error type.
+    }
+    setLoadingValue = false;
+  }
+
+  static void getUserProfile({BuildContext context, String url}) async {
+    Navigator.pushNamed(context, RouteNames.loading); //Loading screen
     try {
       Response response = await get(url);
       UserProfile userProfile = UserProfile.fromJson(jsonDecode(response.body));
-      _userProfile.add(userProfile);
+      Navigator.pushReplacementNamed(context, RouteNames.profile, arguments: userProfile);
     } catch (error) {
       print(error);
+      Navigator.pushNamed(context, RouteNames.error, arguments: error); ////Check error type.
     }
-    _isLoading.add(false);
   }
 }

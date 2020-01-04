@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:github_finder_rxdart_getit/pages/ErrorScreen.dart';
 import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/pages/SearchingUsersPage.dart';
-import 'package:github_finder_rxdart_getit/pages/ShowUsersPage.dart';
+import 'package:github_finder_rxdart_getit/pages/SearchUsersResultPage.dart';
 import 'package:github_finder_rxdart_getit/pages/UserProfilePage.dart';
 import 'services.dart';
 
 void main() {
 	getIt.registerLazySingleton<UserService>(() => UserService());
+	getIt.registerLazySingleton<SearchParameters>(() => SearchParameters());
 	runApp(MaterialApp(
 		initialRoute: RouteNames.index,
 		routes: {
 			RouteNames.index: (BuildContext context) => SearchingUsersPage(),
-			RouteNames.users: (BuildContext context) => ShowUsersPage(),
+			RouteNames.users: (BuildContext context) => SearchUsersResultPage(),
 			RouteNames.profile: (BuildContext context) => UserProfilePage(),
 			RouteNames.loading: (BuildContext context) => LoadingScreen(),
+			RouteNames.error: (BuildContext context) => ErrorScreen(),
 		},
 		theme: ThemeData(
 			brightness: Brightness.light,
