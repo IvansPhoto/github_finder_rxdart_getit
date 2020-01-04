@@ -61,35 +61,37 @@ class ImageUrlIndicator extends StatelessWidget {
   }
 }
 
-Widget searchingButton(BuildContext context) {
-  final _searchParameters = getIt.get<SearchParameters>();
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: <Widget>[
-      IconButton(
+class SearchingButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final _searchParameters = getIt.get<SearchParameters>();
+    print(_searchParameters.getPage);
+    print(_searchParameters.currentGHUResponse.totalCount);
+    print(_searchParameters.perPage);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        IconButton(
           icon: Icon(Icons.navigate_before),
-          onPressed: () {
+          disabledColor: Colors.grey[250],
+          color: Colors.red[800],
+          onPressed: _searchParameters.getPage != 1 ? () {
             _searchParameters.decreasePage();
             _searchParameters.searchUsers(searchParameters: _searchParameters, context: context);
-          }),
-      IconButton(
+          } : null,
+        ),
+        Text('${_searchParameters.getPage} / ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage}'),
+        IconButton(
           icon: Icon(Icons.navigate_next),
-          onPressed: () {
+          disabledColor: Colors.grey[250],
+          color: Colors.red[800],
+          onPressed: (_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage) != _searchParameters.getPage ? () {
             _searchParameters.increasePage();
             _searchParameters.searchUsers(searchParameters: _searchParameters, context: context);
-          }),
-    ],
-  );
-}
-
-class MainAppBar extends AppBar {
-  final String newTitle;
-
-  MainAppBar({this.newTitle}) : super();
-
-  @override
-  PreferredSizeWidget build(BuildContext context) {
-    return AppBar(elevation: 0, centerTitle: true, title: Text(newTitle));
+          } : null,
+        ),
+      ],
+    );
   }
 }
