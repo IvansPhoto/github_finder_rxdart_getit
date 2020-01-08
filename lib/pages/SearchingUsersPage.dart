@@ -3,59 +3,61 @@ import 'package:github_finder_rxdart_getit/widgets.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 
 class SearchingUsersPage extends StatelessWidget {
-	final _searchParameters = getIt.get<SearchParameters>();
-	final _formKey = GlobalKey<FormState>();
-	final _userNameKey = TextEditingController();
-	final _perPageKey = TextEditingController();
+  final _searchParameters = getIt.get<SearchParameters>();
+  final _formKey = GlobalKey<FormState>();
 
-	@override
-	Widget build(BuildContext context) {
-		return Scaffold(
-			drawer: MainDrawer(),
-			appBar: AppBar(title: Text('Index Page'), elevation: 0, centerTitle: true),
-			body: Center(
-				child: Form(
-						key: _formKey,
-						autovalidate: true, //How this relates to initialValue?
-						child: Padding(
-							padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 15),
-							child: Column(
-								mainAxisSize: MainAxisSize.max,
-								crossAxisAlignment: CrossAxisAlignment.stretch,
-								children: <Widget>[
-									TextFormField(
-										keyboardType: TextInputType.text,
-										controller: _userNameKey,
-										decoration: const InputDecoration(hintText: 'Input a user name'),
-										validator: (value) {
-											return value.isEmpty ? 'Enter a user name here.' : null;
-										},
-									),
-									TextFormField(
-										keyboardType: TextInputType.number,
-										controller: _perPageKey,
-										decoration: const InputDecoration(hintText: 'Result per  page'),
-//                    initialValue: '15',
-										validator: (value) => value.isEmpty ? 'Enter a user name here.' : null,
-									),
-									FlatButton(
-										color: Theme.of(context).primaryColor,
-										disabledColor: Colors.grey[600],
-										disabledTextColor: Colors.grey[400],
-										onPressed: () {
-											if (_formKey.currentState.validate()) {
-												_searchParameters.setString = _userNameKey.text; //Set search string to object.
-												_searchParameters.setPerPage = int.parse(_perPageKey.text);
-												_searchParameters.searchUsers(context: context,searchParameters: _searchParameters);
-												Navigator.pushNamed(context, RouteNames.users);
-											}
-										},
-										child: Text('Submit'),
-									),
-								],
-							),
-						)),
-			),
-		);
-	}
+  @override
+  Widget build(BuildContext context) {
+    final _userNameKey = TextEditingController();
+    final _perPageKey = TextEditingController(text: _searchParameters.getPerPage.toString());
+    return Scaffold(
+      drawer: MainDrawer(),
+      appBar: AppBar(title: Text('Index Page'), elevation: 0, centerTitle: true),
+      body: Center(
+        child: Form(
+            key: _formKey,
+            autovalidate: true,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 15),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  SizedBox(height: 25),
+                  Text('Search a user by his login and profile properties.'),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    keyboardType: TextInputType.text,
+                    controller: _userNameKey,
+                    decoration: const InputDecoration(hintText: 'Input a user name'),
+                    validator: (value) => value.isEmpty ? 'Enter a user name here.' : null,
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: _perPageKey,
+                    decoration: const InputDecoration(hintText: 'Result per page'),
+                    validator: (value) => value.isEmpty ? 'Enter a user name here.' : null,
+                  ),
+                  RaisedButton.icon(
+                      elevation: 0,
+                      disabledElevation: 0,
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          _searchParameters.setString = _userNameKey.text; //Set search string to object.
+                          _searchParameters.setPerPage = int.parse(_perPageKey.text);
+                          _searchParameters.setPage = 1;
+                          _searchParameters.searchUsers(context: context, searchParameters: _searchParameters);
+                          Navigator.pushNamed(context, RouteNames.users);
+                        } else {
+                          return null;
+                        }
+                      },
+                      icon: Icon(Icons.search),
+                      label: Text('Start searching'))
+                ],
+              ),
+            )),
+      ),
+    );
+  }
 }

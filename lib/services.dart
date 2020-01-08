@@ -275,7 +275,7 @@ class SearchParameters {
 	String searchString;
 	int page;
 	int perPage;
-	SearchParameters({this.searchString, this.page = 1, this.perPage = 15});
+	SearchParameters({this.searchString, this.page = 1, this.perPage = 5});
 
 	set setString(String newSearchString) => searchString = newSearchString;
 	set setPage(int newPage) => page = newPage;
@@ -298,13 +298,8 @@ class SearchParameters {
 	GitHubUserResponse get currentGHUResponse => _gitHubUserResponse.value;
 	set setGHUResponse(GitHubUserResponse gitHubUserResponse) => _gitHubUserResponse.add(gitHubUserResponse);
 
-//	final BehaviorSubject _isLoading = BehaviorSubject<bool>();
-//	Stream get streamIsLoading$ => _isLoading.stream;
-//	bool get isLoadingValue => _isLoading.value;
-//	set setLoadingValue(bool loading) => _isLoading.add(loading);
 
 	void searchUsers({@required BuildContext context, SearchParameters searchParameters}) async {
-//		setLoadingValue = true;
 		setGHUResponse = null; //Set to null to make 'snapshot.hasData = false' in the page of search result.
 		try {
 			Response response =
@@ -315,7 +310,6 @@ class SearchParameters {
 			print(error);
 			Navigator.pushNamed(context, RouteNames.error, arguments: error); //Check error type.
 		}
-//		setLoadingValue = false;
 	}
 
 	static void getUserProfile({BuildContext context, String url}) async {
