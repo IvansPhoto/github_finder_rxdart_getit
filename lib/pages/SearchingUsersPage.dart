@@ -36,8 +36,18 @@ class SearchingUsersPage extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     controller: _perPageKey,
                     decoration: const InputDecoration(hintText: 'Result per page'),
-                    validator: (value) => value.isEmpty ? 'Enter a user name here.' : null,
+                    validator: (data) {
+                      if (data.isEmpty)
+                        return 'Set matches per page.';
+                      else if (RegExp(r'[\D]').hasMatch(data))
+                        return 'It should be a number!';
+                      else if ((int.tryParse(data, radix: 10) > 100) || (int.tryParse(data, radix: 10) <= 0))
+                        return 'The number shoud be from 1 to 100!';
+                      else
+                        return null;
+                    },
                   ),
+                  SizedBox(height: 10),
                   RaisedButton.icon(
                       elevation: 0,
                       disabledElevation: 0,

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-//import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 import 'package:github_finder_rxdart_getit/widgets.dart';
 
 class UserProfilePage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     UserProfile theUserProfile = ModalRoute.of(context).settings.arguments;
@@ -14,7 +12,10 @@ class UserProfilePage extends StatelessWidget {
           padding: const EdgeInsets.all(15.0),
           child: ListView(
             children: <Widget>[
-              ImageUrlIndicator(url: theUserProfile.avatarUrl, height: MediaQuery.of(context).size.width, width: MediaQuery.of(context).size.width),
+              Hero(
+                tag: theUserProfile.avatarUrl,
+                child: ImageUrlIndicator(url: theUserProfile.avatarUrl, height: MediaQuery.of(context).size.width, width: MediaQuery.of(context).size.width),
+              ),
               Text(theUserProfile.login),
               Text(theUserProfile.name),
               Text(theUserProfile.email),

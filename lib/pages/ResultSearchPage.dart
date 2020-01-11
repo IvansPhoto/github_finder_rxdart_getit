@@ -3,7 +3,7 @@ import 'package:github_finder_rxdart_getit/pages/LoadingScreen.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
 import 'package:github_finder_rxdart_getit/widgets.dart';
 
-class SearchUsersResultPage extends StatelessWidget {
+class ResultSearchPage extends StatelessWidget {
   final _searchParameters = getIt.get<SearchParameters>();
 
   @override
@@ -16,6 +16,7 @@ class SearchUsersResultPage extends StatelessWidget {
             if (!snapshot.hasData) {
               return LoadingScreen();
             } else {
+              print(_searchParameters.currentGHUResponse.totalCount);
               final List<GitHubUsers> gitHubUsers = snapshot.data.users;
               return ListView.builder(
                   itemCount: gitHubUsers.length + 1,
@@ -37,7 +38,10 @@ class SearchUsersResultPage extends StatelessWidget {
                             Container(
                               width: 100,
                               height: 100,
-                              child: ImageUrlIndicator(url: gitHubUsers[index].avatarUrl),
+                              child: Hero(
+	                              tag: gitHubUsers[index].avatarUrl,
+                                child: ImageUrlIndicator(url: gitHubUsers[index].avatarUrl),
+                              ),
                             ),
                             Container(width: 10),
                             Column(
@@ -45,12 +49,12 @@ class SearchUsersResultPage extends StatelessWidget {
                               children: <Widget>[
                                 Text('Login: ' + gitHubUsers[index].login),
                                 Text('Score: ' + gitHubUsers[index].score.toString()),
-                                FlatButton(
+                                RaisedButton(
                                   onPressed: () {
-                                    SearchParameters.getUserProfile(context: context, url: gitHubUsers[index].url);
+                                    SearchParameters.showUserProfileHero(context: context, url: gitHubUsers[index].url);
                                   },
                                   child: Text('View profile'),
-                                )
+                                ),
                               ],
                             ),
                           ],

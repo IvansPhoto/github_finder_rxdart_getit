@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:github_finder_rxdart_getit/services.dart';
@@ -81,14 +82,13 @@ class SearchingButton extends StatelessWidget {
         ),
         FlatButton(
           onPressed: () {
-//						showModalBottomSheet(
-//								context: context,
-//								builder: (builder) {
-//									return Container(
-//										height: 50,
-//										child: SetPage(),
-//									);
-//								});
+//            showModalBottomSheet(
+//                isScrollControlled: false,
+//                elevation: 0,
+//                context: context,
+//                builder: (builder) {
+//                  return SetPageModal();
+//                });
 
             Navigator.push(
                 context,
@@ -99,11 +99,12 @@ class SearchingButton extends StatelessWidget {
                   fullscreenDialog: true,
                 ));
           },
-          child: Text('${_searchParameters.getPage} / ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage}'),
+          child: Text('${_searchParameters.getPage} / ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage} (${1000 ~/ _searchParameters.perPage})'),
         ),
         IconButton(
           icon: Icon(Icons.navigate_next),
-          onPressed: (_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage) != _searchParameters.getPage
+          onPressed: ((_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage) != _searchParameters.getPage &&
+                  _searchParameters.getPage < (1000 / _searchParameters.perPage))
               ? () {
                   _searchParameters.increasePage();
                   _searchParameters.searchUsers(searchParameters: _searchParameters, context: context);
@@ -123,7 +124,7 @@ class SetPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final _setPageKey = TextEditingController(text: _searchParameters.getPage.toString());
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text("Return to the search result")),
       body: Center(
         child: Form(
             autovalidate: true,
@@ -134,16 +135,27 @@ class SetPage extends StatelessWidget {
               children: <Widget>[
                 Text('Set the page number (current is ${_setPageKey.text}).'),
                 TextFormField(
-	                textAlign: TextAlign.center,
-	                cursorColor: Colors.red[900],
-                  controller: _setPageKey,
-                  keyboardType: TextInputType.number,
-                  onSaved: (data) => (_searchParameters.setPage = int.parse(data)),
-                  validator: (data) => data.isEmpty ? 'Page Num.!' : null,
-                ),
+                    textAlign: TextAlign.center,
+                    cursorColor: Colors.red[900],
+                    controller: _setPageKey,
+                    enableSuggestions: false,
+//                  inputFormatters: <TextInputFormatter>[],
+                    keyboardType: TextInputType.number,
+                    onSaved: (data) => (_searchParameters.setPage = int.tryParse(data, radix: 10)),
+                    validator: (data) {
+                      if (data.isEmpty)
+                        return 'Set the Page Number.';
+                      else if (RegExp(r'[\D]').hasMatch(data))
+                        return 'Set a number!';
+                      else if (int.tryParse(data, radix: 10) > (_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage) ||
+                          (int.tryParse(data, radix: 10) <= 0))
+                        return 'The number shoud be from 1 to ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage}'; //Set constrains about 1000 search result
+                      else
+                        return null;
+                    }),
                 FlatButton(
                   onPressed: () {
-                    _searchParameters.setPage = int.parse(_setPageKey.text);
+                    _searchParameters.setPage = int.tryParse(_setPageKey.text);
                     _searchParameters.searchUsers(context: context, searchParameters: _searchParameters);
                     Navigator.pop(context);
                   },
@@ -151,6 +163,56 @@ class SetPage extends StatelessWidget {
                 )
               ],
             )),
+      ),
+    );
+  }
+}
+
+class SetPageModal extends StatelessWidget {
+  final _searchParameters = getIt.get<SearchParameters>();
+
+  @override
+  Widget build(BuildContext context) {
+    final _setPageKey = TextEditingController(text: _searchParameters.getPage.toString());
+    return Container(
+      height: MediaQuery.of(context).size.height / 2,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(height: 15),
+          Text('Set the page number (current is ${_setPageKey.text}).'),
+          TextFormField(
+            autofocus: true,
+            onFieldSubmitted: (data) => _searchParameters.setPage = int.tryParse(data),
+            textAlign: TextAlign.center,
+            cursorColor: Colors.red[900],
+            controller: _setPageKey,
+            keyboardType: TextInputType.number,
+            onSaved: (data) => _searchParameters.setPage = int.tryParse(data),
+            validator: (data) {
+              print('validator');
+              if (data.isEmpty) {
+                return 'Set the Page Number!';
+              } else if (int.tryParse(data, radix: 10) > (_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage)) {
+                return 'The number shoud be less ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage}';
+              } else if (int.tryParse(data, radix: 10) < 0) {
+                return 'The Page Number is positive!';
+              } else {
+                print('null');
+                return null;
+              }
+            },
+          ),
+          FlatButton(
+            onPressed: () {
+              _searchParameters.setPage = int.tryParse(_setPageKey.text);
+              _searchParameters.searchUsers(context: context, searchParameters: _searchParameters);
+              Navigator.pop(context);
+            },
+            child: Text('Set'),
+          )
+        ],
       ),
     );
   }

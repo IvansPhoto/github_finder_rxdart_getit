@@ -302,6 +302,7 @@ class SearchParameters {
 	void searchUsers({@required BuildContext context, SearchParameters searchParameters}) async {
 		setGHUResponse = null; //Set to null to make 'snapshot.hasData = false' in the page of search result.
 		try {
+			print('https://api.github.com/search/users?q=${searchParameters.getSearchString}&per_page=${searchParameters.getPerPage}&page=${searchParameters.getPage}');
 			Response response =
 			await get('https://api.github.com/search/users?q=${searchParameters.getSearchString}&per_page=${searchParameters.getPerPage}&page=${searchParameters.getPage}');
 			GitHubUserResponse gitHubUserResponse = GitHubUserResponse.fromJson(jsonDecode(response.body));
@@ -312,15 +313,26 @@ class SearchParameters {
 		}
 	}
 
-	static void getUserProfile({BuildContext context, String url}) async {
-		Navigator.pushNamed(context, RouteNames.loading); //Loading screen
+	static void showUserProfileHero({BuildContext context, String url}) async {
 		try {
 			Response response = await get(url);
 			UserProfile userProfile = UserProfile.fromJson(jsonDecode(response.body));
-			Navigator.pushReplacementNamed(context, RouteNames.profile, arguments: userProfile);
+			Navigator.pushNamed(context, RouteNames.profile, arguments: userProfile);
 		} catch (error) {
 			print(error);
 			Navigator.pushNamed(context, RouteNames.error, arguments: error); ////Check error type.
 		}
 	}
+
+//	static void getUserProfile({BuildContext context, String url}) async {
+//		Navigator.pushNamed(context, RouteNames.loading); //Loading screen
+//		try {
+//			Response response = await get(url);
+//			UserProfile userProfile = UserProfile.fromJson(jsonDecode(response.body));
+//			Navigator.pushReplacementNamed(context, RouteNames.profile, arguments: userProfile);
+//		} catch (error) {
+//			print(error);
+//			Navigator.pushNamed(context, RouteNames.error, arguments: error); ////Check error type.
+//		}
+//	}
 }
