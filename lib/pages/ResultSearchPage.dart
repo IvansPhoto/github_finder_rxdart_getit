@@ -22,12 +22,7 @@ class ResultSearchPage extends StatelessWidget {
                   itemCount: gitHubUsers.length + 1,
                   itemBuilder: (BuildContext context, int index) {
                     if (gitHubUsers.length <= 1) {
-                      return Center(
-                          heightFactor: 10,
-                          child: Text(
-                            'No users found',
-                            style: TextStyle(fontSize: 45),
-                          ));
+                      return Center(heightFactor: 10, child: Text('No users found', style: TextStyle(fontSize: 45)));
                     } else if (index > gitHubUsers.length - 1) {
                       return SearchingButton();
                     } else {
@@ -39,7 +34,7 @@ class ResultSearchPage extends StatelessWidget {
                               width: 100,
                               height: 100,
                               child: Hero(
-	                              tag: gitHubUsers[index].avatarUrl,
+                                tag: gitHubUsers[index].avatarUrl,
                                 child: ImageUrlIndicator(url: gitHubUsers[index].avatarUrl),
                               ),
                             ),
@@ -50,6 +45,7 @@ class ResultSearchPage extends StatelessWidget {
                                 Text('Login: ' + gitHubUsers[index].login),
                                 Text('Score: ' + gitHubUsers[index].score.toString()),
                                 RaisedButton(
+	                                elevation: 0,
                                   onPressed: () {
                                     SearchParameters.showUserProfileHero(context: context, url: gitHubUsers[index].url);
                                   },

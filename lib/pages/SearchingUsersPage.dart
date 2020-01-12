@@ -50,7 +50,6 @@ class SearchingUsersPage extends StatelessWidget {
                   SizedBox(height: 10),
                   RaisedButton.icon(
                       elevation: 0,
-                      disabledElevation: 0,
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
                           _searchParameters.setString = _userNameKey.text; //Set search string to object.

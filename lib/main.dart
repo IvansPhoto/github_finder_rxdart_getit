@@ -89,7 +89,7 @@ void main() {
         title: TextStyle(fontSize: 20, color: Colors.orange),
         button: TextStyle(fontSize: 20, color: Colors.orange),
         body1: TextStyle(fontSize: 20, color: Colors.grey[50]),
-        display1: TextStyle(fontSize: 25, color: Colors.red[500]),
+        display1: TextStyle(fontSize: 20, color: Colors.red[500]),
       ),
     ),
     title: "The App",
