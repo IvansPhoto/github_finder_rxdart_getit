@@ -3,6 +3,9 @@ import 'package:github_finder_rxdart_getit/services.dart';
 import 'package:github_finder_rxdart_getit/widgets.dart';
 
 class UserProfilePage extends StatelessWidget {
+	final double _verticalPadding = 3.5;
+	final double _verticalHeight = 1;
+
 	Widget _rowProperties(BuildContext context, String propertyName, String dataProperty) {
 		return Column(
 			children: <Widget>[
@@ -12,30 +15,45 @@ class UserProfilePage extends StatelessWidget {
 						Text(dataProperty),
 					],
 				),
-				Container(height: 1, color: Colors.grey, margin: EdgeInsets.symmetric(vertical: 3.5)),
+				Container(height: _verticalHeight, color: Colors.grey, margin: EdgeInsets.symmetric(vertical: _verticalPadding)),
 			],
 		);
 	}
+
 	Widget _listViewHorizontal(BuildContext context, String propertyName, String dataProperty) {
 		return Column(
 			mainAxisSize: MainAxisSize.min,
 			children: <Widget>[
-			  Container(
-				  height: 25,
-			    child: ListView(
-			    	scrollDirection: Axis.horizontal,
-			    	children: <Widget>[
-			    		Text(propertyName, style: Theme.of(context).textTheme.display1),
-			    		Text(dataProperty),
-			    	],
-			    ),
-			  ),
-				Container(height: 1, color: Colors.grey, margin: EdgeInsets.symmetric(vertical: 3.5)),
+				Container(
+					height: 25,
+					child: ListView(
+						scrollDirection: Axis.horizontal,
+						children: <Widget>[
+							Text(propertyName, style: Theme.of(context).textTheme.display1),
+							Text(dataProperty),
+						],
+					),
+				),
+				Container(height: _verticalHeight, color: Colors.grey, margin: EdgeInsets.symmetric(vertical: _verticalPadding)),
 			],
 		);
 	}
 
-
+	Widget _textSpans(BuildContext context, String propertyName, String dataProperty) {
+		return Column(
+			crossAxisAlignment: CrossAxisAlignment.start,
+			mainAxisAlignment: MainAxisAlignment.center,
+		  children: <Widget>[
+		    Text.rich(
+		    	TextSpan(children: [
+		    		TextSpan(text: propertyName, style: Theme.of(context).textTheme.display1),
+		    		TextSpan(text: dataProperty),
+		    	]),
+		    ),
+			  Container(height: _verticalHeight, color: Colors.grey, margin: EdgeInsets.symmetric(vertical: _verticalPadding)),
+		  ],
+		);
+	}
 
 	@override
 	Widget build(BuildContext context) {
@@ -61,31 +79,9 @@ class UserProfilePage extends StatelessWidget {
 								_rowProperties(context, 'Email: ', theUserProfile.email),
 								_rowProperties(context, 'Company: ', theUserProfile.company),
 								_rowProperties(context, 'Hireable: ', theUserProfile.hireable.toString()),
-
 								_listViewHorizontal(context, 'Page: ', theUserProfile.htmlUrl),
-								Container(
-									height: 25,
-									child: ListView(
-										scrollDirection: Axis.horizontal,
-										children: <Widget>[
-											Text('Blog: ', style: Theme.of(context).textTheme.display1),
-											Text(theUserProfile.blog),
-										],
-									),
-								),
-								Container(height: 1, color: Colors.grey, margin: EdgeInsets.symmetric(vertical: 3.5)),
-								Container(
-									height: 25,
-									child: ListView(
-										scrollDirection: Axis.horizontal,
-										children: <Widget>[
-											Text('Biography: ', style: Theme.of(context).textTheme.display1),
-											Text(theUserProfile.bio),
-										],
-									),
-								),
-//                Text('Biography: ', style: Theme.of(context).textTheme.display1),
-//                Text(theUserProfile.bio),
+								_listViewHorizontal(context, 'Blog: ', theUserProfile.blog),
+								_textSpans(context, 'Biography: ', theUserProfile.bio)
 							],
 						),
 					)),

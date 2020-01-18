@@ -67,13 +67,15 @@ class SearchingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _searchParameters = getIt.get<SearchParameters>();
+    final int _theLastPageNumber = (_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage).ceil();
+    final int _apiMaxPage = (1000 ~/ _searchParameters.getPerPage).ceil();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         IconButton(
-          icon: Icon(Icons.navigate_before),
+          icon: Icon(Icons.navigate_before, size: 35),
           onPressed: _searchParameters.getPage != 1
               ? () {
                   _searchParameters.decreasePage();
@@ -83,14 +85,6 @@ class SearchingButton extends StatelessWidget {
         ),
         FlatButton(
           onPressed: () {
-//            showModalBottomSheet(
-//                isScrollControlled: false,
-//                elevation: 0,
-//                context: context,
-//                builder: (builder) {
-//                  return SetPageModal();
-//                });
-
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -100,12 +94,12 @@ class SearchingButton extends StatelessWidget {
                   fullscreenDialog: true,
                 ));
           },
-          child: Text('${_searchParameters.getPage} / ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage} (${1000 ~/ _searchParameters.perPage})'),
+          child: Text('${_searchParameters.getPage} / ${_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber}'),
         ),
         IconButton(
-          icon: Icon(Icons.navigate_next),
-          onPressed: ((_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage) != _searchParameters.getPage &&
-                  _searchParameters.getPage < (1000 / _searchParameters.perPage))
+          icon: Icon(Icons.navigate_next, size: 35,),
+          onPressed: ((_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage) != _searchParameters.getPage &&
+                  _searchParameters.getPage < (1000 / _searchParameters.getPerPage))
               ? () {
                   _searchParameters.increasePage();
                   _searchParameters.searchUsers(searchParameters: _searchParameters, context: context);
@@ -118,52 +112,60 @@ class SearchingButton extends StatelessWidget {
 }
 
 class SetPage extends StatelessWidget {
-  final _searchParameters = getIt.get<SearchParameters>();
-  final _formKey = GlobalKey<FormState>();
+	final _searchParameters = getIt.get<SearchParameters>();
+	final _formKey = GlobalKey<FormState>();
 
-  @override
-  Widget build(BuildContext context) {
-    final _setPageKey = TextEditingController(text: _searchParameters.getPage.toString());
+	@override
+	Widget build(BuildContext context) {
+		final TextEditingController _setPageKey = TextEditingController(text: _searchParameters.getPage.toString());
+		final int _theLastPageNumber = (_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage).ceil();
+		final int _apiMaxPage = (1000 ~/ _searchParameters.getPerPage).ceil();
     return Scaffold(
       appBar: AppBar(title: Text("Return to the search result")),
       body: Center(
-        child: Form(
-            autovalidate: true,
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Text('Set the page number (current is ${_setPageKey.text}).'),
-                TextFormField(
-                    textAlign: TextAlign.center,
-                    cursorColor: Colors.red[900],
-                    controller: _setPageKey,
-                    enableSuggestions: false,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(height: MediaQuery.of(context).size.height / 4),
+            Text('Matches found: ${_searchParameters.currentGHUResponse.totalCount}'),
+            _searchParameters.currentGHUResponse.totalCount > 1000
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                    child: Text('The available only the first 1000 matches', style: Theme.of(context).textTheme.overline),
+                  )
+                : Container(),
+            TextFormField(
+                key: _formKey,
+                autovalidate: true,
+                textAlign: TextAlign.center,
+                cursorColor: Colors.red[900],
+                controller: _setPageKey,
+                enableSuggestions: false,
 //                  inputFormatters: <TextInputFormatter>[],
-                    keyboardType: TextInputType.number,
-                    onSaved: (data) => (_searchParameters.setPage = int.tryParse(data, radix: 10)),
-                    validator: (data) {
-                      if (data.isEmpty)
-                        return 'Set the Page Number.';
-                      else if (RegExp(r'[\D]').hasMatch(data))
-                        return 'Set a number!';
-                      else if (int.tryParse(data, radix: 10) > (_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage) ||
-                          (int.tryParse(data, radix: 10) <= 0))
-                        return 'The number shoud be from 1 to ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage}'; //Set constrains about 1000 search result
-                      else
-                        return null;
-                    }),
-                FlatButton(
-                  onPressed: () {
-                    _searchParameters.setPage = int.tryParse(_setPageKey.text);
-                    _searchParameters.searchUsers(context: context, searchParameters: _searchParameters);
-                    Navigator.pop(context);
-                  },
-                  child: Text('Set'),
-                )
-              ],
-            )),
+                keyboardType: TextInputType.number,
+                onSaved: (data) => (_searchParameters.setPage = int.tryParse(data, radix: 10)),
+                validator: (data) {
+                  if (data.isEmpty)
+                    return 'Set the Page Number.';
+                  else if (RegExp(r'[\D]').hasMatch(data))
+                    return 'Set a number!';
+                  else if (int.tryParse(data, radix: 10) > (_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber) || (int.tryParse(data, radix: 10) <= 0))
+                    return 'The number shoud be from 1 to ${_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber}';
+                  else
+                    return null;
+                }),
+	          Text('Current - ${_setPageKey.text}. The last page - ${_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber}'),
+	          RaisedButton(
+              onPressed: () {
+                _searchParameters.setPage = int.tryParse(_setPageKey.text);
+                _searchParameters.searchUsers(context: context, searchParameters: _searchParameters);
+                Navigator.pop(context);
+              },
+              child: Text('Set the page number'),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -195,8 +197,8 @@ class SetPageModal extends StatelessWidget {
               print('validator');
               if (data.isEmpty) {
                 return 'Set the Page Number!';
-              } else if (int.tryParse(data, radix: 10) > (_searchParameters.currentGHUResponse.totalCount / _searchParameters.perPage)) {
-                return 'The number shoud be less ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.perPage}';
+              } else if (int.tryParse(data, radix: 10) > (_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage)) {
+                return 'The number shoud be less ${_searchParameters.currentGHUResponse.totalCount ~/ _searchParameters.getPerPage}';
               } else if (int.tryParse(data, radix: 10) < 0) {
                 return 'The Page Number is positive!';
               } else {

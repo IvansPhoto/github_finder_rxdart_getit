@@ -21,7 +21,7 @@ class ResultSearchPage extends StatelessWidget {
               return ListView.builder(
                   itemCount: gitHubUsers.length + 1,
                   itemBuilder: (BuildContext context, int index) {
-                    if (gitHubUsers.length <= 1) {
+                    if (gitHubUsers.length < 1) {
                       return Center(heightFactor: 10, child: Text('No users found', style: TextStyle(fontSize: 45)));
                     } else if (index > gitHubUsers.length - 1) {
                       return SearchingButton();
@@ -45,7 +45,7 @@ class ResultSearchPage extends StatelessWidget {
                                 Text('Login: ' + gitHubUsers[index].login),
                                 Text('Score: ' + gitHubUsers[index].score.toString()),
                                 RaisedButton(
-	                                elevation: 0,
+                                  elevation: 0,
                                   onPressed: () {
                                     SearchParameters.showUserProfileHero(context: context, url: gitHubUsers[index].url);
                                   },
