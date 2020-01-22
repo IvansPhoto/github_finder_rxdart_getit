@@ -97,7 +97,10 @@ class SearchingButton extends StatelessWidget {
           child: Text('${_searchParameters.getPage} / ${_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber}'),
         ),
         IconButton(
-          icon: Icon(Icons.navigate_next, size: 35,),
+          icon: Icon(
+            Icons.navigate_next,
+            size: 35,
+          ),
           onPressed: ((_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage) != _searchParameters.getPage &&
                   _searchParameters.getPage < (1000 / _searchParameters.getPerPage))
               ? () {
@@ -112,14 +115,14 @@ class SearchingButton extends StatelessWidget {
 }
 
 class SetPage extends StatelessWidget {
-	final _searchParameters = getIt.get<SearchParameters>();
-	final _formKey = GlobalKey<FormState>();
+  final _searchParameters = getIt.get<SearchParameters>();
+  final _formKey = GlobalKey<FormState>();
 
-	@override
-	Widget build(BuildContext context) {
-		final TextEditingController _setPageKey = TextEditingController(text: _searchParameters.getPage.toString());
-		final int _theLastPageNumber = (_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage).ceil();
-		final int _apiMaxPage = (1000 ~/ _searchParameters.getPerPage).ceil();
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController _setPageKey = TextEditingController(text: _searchParameters.getPage.toString());
+    final int _theLastPageNumber = (_searchParameters.currentGHUResponse.totalCount / _searchParameters.getPerPage).ceil();
+    final int _apiMaxPage = (1000 ~/ _searchParameters.getPerPage).ceil();
     return Scaffold(
       appBar: AppBar(title: Text("Return to the search result")),
       body: Center(
@@ -142,8 +145,18 @@ class SetPage extends StatelessWidget {
                 cursorColor: Colors.red[900],
                 controller: _setPageKey,
                 enableSuggestions: false,
-//                  inputFormatters: <TextInputFormatter>[],
+//								inputFormatters: <TextInputFormatter>[],
                 keyboardType: TextInputType.number,
+                onChanged: (data) {
+	                _setPageKey.value = TextEditingValue(text: data);
+	                _setPageKey.text = data;
+	                print(data);
+                },
+                onFieldSubmitted: (data) {
+                  _setPageKey.value = TextEditingValue(text: data);
+                  _setPageKey.text = data;
+                  print(data);
+                },
                 onSaved: (data) => (_searchParameters.setPage = int.tryParse(data, radix: 10)),
                 validator: (data) {
                   if (data.isEmpty)
@@ -155,8 +168,8 @@ class SetPage extends StatelessWidget {
                   else
                     return null;
                 }),
-	          Text('Current - ${_setPageKey.text}. The last page - ${_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber}'),
-	          RaisedButton(
+            Text('Current - ${_setPageKey.text}. The last page - ${_theLastPageNumber > _apiMaxPage ? _apiMaxPage : _theLastPageNumber}'),
+            RaisedButton(
               onPressed: () {
                 _searchParameters.setPage = int.tryParse(_setPageKey.text);
                 _searchParameters.searchUsers(context: context, searchParameters: _searchParameters);

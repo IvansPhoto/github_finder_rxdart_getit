@@ -7,13 +7,13 @@ class SearchingUsersPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) {
-    final _userNameKey = TextEditingController();
-    final _perPageKey = TextEditingController(text: _searchParameters.getPerPage.toString());
-    return Scaffold(
-      drawer: MainDrawer(),
-      appBar: AppBar(title: Text('Index Page'), elevation: 0, centerTitle: true),
-      body: Center(
+	Widget build(BuildContext context) {
+		final _userNameKey = TextEditingController();
+		final _perPageKey = TextEditingController(text: _searchParameters.getPerPage.toString());
+		return Scaffold(
+			drawer: MainDrawer(),
+			appBar: AppBar(title: Text('Index Page'), elevation: 0, centerTitle: true),
+			body: Center(
         child: Form(
             key: _formKey,
             autovalidate: true,

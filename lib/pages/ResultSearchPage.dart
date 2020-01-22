@@ -15,8 +15,29 @@ class ResultSearchPage extends StatelessWidget {
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
               return LoadingScreen();
+						} else if (_searchParameters.currentGHUResponse.headerStatus != '200 OK') {
+							return Padding(
+							  padding: const EdgeInsets.symmetric(horizontal: 15),
+							  child: Column(
+							  	crossAxisAlignment: CrossAxisAlignment.center,
+							  	mainAxisAlignment: MainAxisAlignment.center,
+							  	children: <Widget>[
+							  	Text(_searchParameters.currentGHUResponse.headerStatus),
+							  	Padding(
+							  	  padding: const EdgeInsets.symmetric(vertical: 15),
+							  	  child: Text(_searchParameters.currentGHUResponse.message, style: Theme.of(context).textTheme.overline,),
+							  	),
+							  	Text(_searchParameters.currentGHUResponse.docUrl),
+							  ],),
+							);
+//              return Center(
+//                child: Text.rich(TextSpan(children: [
+//                  TextSpan(text: _searchParameters.currentGHUResponse.message + '\n'),
+//                  TextSpan(text: _searchParameters.currentGHUResponse.docUrl + '\n'),
+//                  TextSpan(text: _searchParameters.currentGHUResponse.headerStatus),
+//                ])),
+//              );
             } else {
-              print(_searchParameters.currentGHUResponse.totalCount);
               final List<GitHubUsers> gitHubUsers = snapshot.data.users;
               return ListView.builder(
                   itemCount: gitHubUsers.length + 1,
